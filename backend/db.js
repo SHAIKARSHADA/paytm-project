@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 mongoose.connect('mongodb+srv://admin:12345@cluster0.axbfs9v.mongodb.net/paytm');
 
-const UserSchema = new mongoose.schema({
+const UserSchema =  mongoose.Schema({
   firstName: String,
   lastName: String,
   password: String,
   userName: String,
 })
 
-const AccountSchema = new mongoose.schema({
+const AccountSchema = mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

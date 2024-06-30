@@ -6,11 +6,11 @@ const { JWT_SECRET } = require('../config');
 const jwt = require('jsonwebtoken');
 const { authMiddleware } = require('../middleware');
 
-const signupSchema = zod.zod.object({
-  userName: zod.zod.string(),
-  password: zod.zod.string(),
-  firstName: zod.zod.string(),
-  lastName: zod.zod.string(),
+const signupSchema = zod.object({
+  userName: zod.string(),
+  password: zod.string(),
+  firstName: zod.string(),
+  lastName: zod.string(),
 })
 
 router.post("/signup",async (req, res) => {
@@ -25,26 +25,29 @@ router.post("/signup",async (req, res) => {
   }
 
   const user = await User.findOne({
-    username: body.username
+    username: req.body.username
   })
 
-  if(user._id) {
+  if(user) {
     return res.status(411).json({
       message: "Email already taken / Incorrect inputs"
     })
   }
 
-  Account.create({
+
+  const dbUser = await User.create(req.body);
+
+  await Account.create({
     userId: dbUser._id,
     balance: 1 + Math.random() * 10000
   })
 
-
-
-  const dbUser = await User.create(body);
   const token = jwt.sign({
     userId: dbUser._id
   },JWT_SECRET)
+
+   
+
 
 
   res.status(200).json({
@@ -57,8 +60,8 @@ router.post("/signup",async (req, res) => {
 
 
 const signinSchema = zod.object({
-  userName: z.string(),
-  password: z.string(),
+  userName: zod.string(),
+  password: zod.string(),
 })
 
 router.post("/signin",async (req, res) => {
@@ -79,7 +82,10 @@ router.post("/signin",async (req, res) => {
     const token = jwt.sign({
       userId: user._id
     },JWT_SECRET) 
-    return
+    return  res.json({
+      message: "User created successfully",
+      token: token 
+    })
   }
 
   res.status(411).json({
@@ -108,7 +114,7 @@ router.put("/",authMiddleware,async (req, res) => {
   })
 })
 
-router.get("bulk",async (req, res) => {
+router.get("/bulk",async (req, res) => {
   const filter = req.query.filter || "";
 
   const users = await User.find({
@@ -133,6 +139,4 @@ router.get("bulk",async (req, res) => {
 
 })
 
-module.export = {
-  router
-}
+module.exports = router;
