@@ -4,12 +4,15 @@ import { Button } from "../components/Button"
 import { Heading } from "../components/Heading"
 import { InputBox } from "../components/InputBox"
 import { SubHeading } from "../components/SubHeading"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 export const Signup = () => {
   const [ firstName, setFirstName ] = useState("")
   const [ lastName, setLastName ] = useState("")
-  const [ email, setEmail] = useState("")
+  const [ username, setUsername] = useState("")
   const [ password, setPassword ] = useState("")
+  const navigate = useNavigate();
  return(
   <>
     <div className="bg-slate-300 h-screen flex justify-center">
@@ -18,19 +21,28 @@ export const Signup = () => {
         <Heading label={"Sign up"}/>  
         <SubHeading label={"Enter your information to create an account"}/>
         <InputBox onChange={(e) => {
-          setFirstName(e.taget.value)
+          setFirstName(e.target.value)
         }} label={"First name"} placeholder={"John"}/>
         <InputBox onChange={(e) => {
-          setLastName(e.taget.value)
+          setLastName(e.target.value)
            }} label={"Last name"} placeholder={"Doe"}/>
         <InputBox onChange={(e) => {
-          setEmail(e.taget.value)
+          setUsername(e.target.value)
            }} label={"Email"} placeholder={"JohnDoe123@gmail.com"}/>
         <InputBox onChange={(e) => {
-          setPassword(e.taget.value)
+          setPassword(e.target.value)
            }} label={"Password"} placeholder={"1234568"}/>
         <div className="pt-4">
-        <Button label={"Sign up"}/>
+        <Button onClick={async () => {
+          const response = await axios.post("http://localhost:3000/api/v1/user/signup", {
+            username,
+            password,
+            firstName,
+            lastName,
+          });
+          localStorage.setItem("token",response.data.token);
+          navigate("/dashboard");
+        }} label={"Sign up"}/>
         </div>
         <BottomWarning label={"Already have an account?"} buttonText={"Sign in"} to={"/signin"}/>
         </div>
